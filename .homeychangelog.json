@@ -1,4 +1,8 @@
 {
+  "1.9.44": {
+    "en": "• Fixed a slightly asymmetric app icon (paw print toes were unevenly spaced/rotated)",
+    "de": "• App-Icon korrigiert: Pfoten-Zehen waren leicht asymmetrisch versetzt und rotiert"
+  },
   "1.9.43": {
     "en": "• Fixed several text fields (safety-margin, device search, battery-type override) showing black text regardless of color theme - Homey's default text-input style was overriding the app's own theme colors",
     "de": "• Fehlerbehebung: mehrere Textfelder (Sicherheitsfaktor, Geräte-Suche, Batterietyp-Override) zeigten unabhängig vom Farbschema schwarzen Text - Homeys Standard-Stil für Textfelder überschrieb die eigenen Theme-Farben"
