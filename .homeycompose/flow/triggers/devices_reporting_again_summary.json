@@ -1,0 +1,29 @@
+{
+  "id": "devices_reporting_again_summary",
+  "title": {
+    "en": "Devices are reporting again",
+    "de": "Geräte melden sich wieder"
+  },
+  "titleFormatted": {
+    "en": "Devices are reporting again",
+    "de": "Geräte melden sich wieder"
+  },
+  "hint": {
+    "en": "Fires once per scan, bundling every device that newly resumed reporting in that scan into a single trigger - the recovery counterpart to \"Devices are newly found not reporting\".",
+    "de": "Wird einmal pro Scan ausgelöst und bündelt alle Geräte, die sich in diesem Scan wieder gemeldet haben, in einem einzigen Trigger - das Erholungs-Gegenstück zu \"Es werden neu Geräte gefunden, die sich nicht mehr melden\"."
+  },
+  "tokens": [
+    {
+      "name": "count",
+      "type": "number",
+      "title": { "en": "Count", "de": "Anzahl" },
+      "example": 2
+    },
+    {
+      "name": "devices",
+      "type": "string",
+      "title": { "en": "Devices", "de": "Geräte" },
+      "example": { "en": "Garage sensor, Garden sensor", "de": "Garage Sensor, Garten Sensor" }
+    }
+  ]
+}

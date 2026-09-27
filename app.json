@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.rickd.devicewatchdog",
-  "version": "1.9.44",
+  "version": "1.9.45",
   "compatibility": ">=12.4.0",
   "sdk": 3,
   "runtime": "nodejs",
@@ -448,6 +448,82 @@
         ]
       },
       {
+        "id": "devices_available_again_summary",
+        "title": {
+          "en": "Devices become available again",
+          "de": "Geräte werden wieder erreichbar"
+        },
+        "titleFormatted": {
+          "en": "Devices become available again",
+          "de": "Geräte werden wieder erreichbar"
+        },
+        "hint": {
+          "en": "Fires in realtime, bundling every device that becomes available again within a few seconds of each other into a single trigger - the recovery counterpart to \"Devices newly become unavailable\".",
+          "de": "Wird in Echtzeit ausgelöst und bündelt alle Geräte, die innerhalb weniger Sekunden nacheinander wieder erreichbar werden, in einem einzigen Trigger - das Erholungs-Gegenstück zu \"Es werden neu Geräte nicht erreichbar\"."
+        },
+        "tokens": [
+          {
+            "name": "count",
+            "type": "number",
+            "title": {
+              "en": "Count",
+              "de": "Anzahl"
+            },
+            "example": 2
+          },
+          {
+            "name": "devices",
+            "type": "string",
+            "title": {
+              "en": "Devices",
+              "de": "Geräte"
+            },
+            "example": {
+              "en": "Front door lock, Garden sensor",
+              "de": "Haustürschloss, Garten Sensor"
+            }
+          }
+        ]
+      },
+      {
+        "id": "devices_battery_ok_again_summary",
+        "title": {
+          "en": "Devices' battery is OK again",
+          "de": "Akkustand von Geräten ist wieder OK"
+        },
+        "titleFormatted": {
+          "en": "Devices' battery is OK again",
+          "de": "Akkustand von Geräten ist wieder OK"
+        },
+        "hint": {
+          "en": "Fires once per scan, bundling every device whose battery rose back above its threshold in that scan into a single trigger - the recovery counterpart to \"Devices with low battery are newly found\".",
+          "de": "Wird einmal pro Scan ausgelöst und bündelt alle Geräte, deren Akkustand in diesem Scan wieder über die Schwelle gestiegen ist, in einem einzigen Trigger - das Erholungs-Gegenstück zu \"Es werden neu Geräte mit niedrigem Akku gefunden\"."
+        },
+        "tokens": [
+          {
+            "name": "count",
+            "type": "number",
+            "title": {
+              "en": "Count",
+              "de": "Anzahl"
+            },
+            "example": 2
+          },
+          {
+            "name": "devices",
+            "type": "string",
+            "title": {
+              "en": "Devices",
+              "de": "Geräte"
+            },
+            "example": {
+              "en": "Garage sensor, Garden sensor",
+              "de": "Garage Sensor, Garten Sensor"
+            }
+          }
+        ]
+      },
+      {
         "id": "devices_low_battery_summary",
         "title": {
           "en": "Devices with low battery are newly found",
@@ -498,6 +574,44 @@
         "hint": {
           "en": "Fires once per scan, bundling every device that newly stopped reporting in that scan into a single trigger - instead of firing \"A device stops reporting\" once per device.",
           "de": "Wird einmal pro Scan ausgelöst und bündelt alle Geräte, die in diesem Scan neu als 'meldet sich nicht' erkannt wurden, in einem einzigen Trigger - statt \"Ein Gerät meldet sich nicht mehr\" einzeln pro Gerät auszulösen."
+        },
+        "tokens": [
+          {
+            "name": "count",
+            "type": "number",
+            "title": {
+              "en": "Count",
+              "de": "Anzahl"
+            },
+            "example": 2
+          },
+          {
+            "name": "devices",
+            "type": "string",
+            "title": {
+              "en": "Devices",
+              "de": "Geräte"
+            },
+            "example": {
+              "en": "Garage sensor, Garden sensor",
+              "de": "Garage Sensor, Garten Sensor"
+            }
+          }
+        ]
+      },
+      {
+        "id": "devices_reporting_again_summary",
+        "title": {
+          "en": "Devices are reporting again",
+          "de": "Geräte melden sich wieder"
+        },
+        "titleFormatted": {
+          "en": "Devices are reporting again",
+          "de": "Geräte melden sich wieder"
+        },
+        "hint": {
+          "en": "Fires once per scan, bundling every device that newly resumed reporting in that scan into a single trigger - the recovery counterpart to \"Devices are newly found not reporting\".",
+          "de": "Wird einmal pro Scan ausgelöst und bündelt alle Geräte, die sich in diesem Scan wieder gemeldet haben, in einem einzigen Trigger - das Erholungs-Gegenstück zu \"Es werden neu Geräte gefunden, die sich nicht mehr melden\"."
         },
         "tokens": [
           {

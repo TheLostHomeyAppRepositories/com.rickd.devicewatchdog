@@ -193,6 +193,8 @@ class DeviceWatchdogApp extends Homey.App {
     this._scanPromise = null;
     this._unavailableBatch = new Set();
     this._unavailableBatchTimer = null;
+    this._availableAgainBatch = new Set();
+    this._availableAgainBatchTimer = null;
     this._pendingUnavailableTimers = new Map();
     this._confirmedUnavailable = new Set();
     // deviceId -> { capId, setAt } - armed by _runAutoTests right after a successful
@@ -320,6 +322,12 @@ class DeviceWatchdogApp extends Homey.App {
     this._triggerNotReportingSummary = this.homey.flow.getTriggerCard('devices_not_reporting_summary');
     this._triggerBatteryLowSummary = this.homey.flow.getTriggerCard('devices_low_battery_summary');
     this._triggerUnavailableSummary = this.homey.flow.getTriggerCard('devices_unavailable_summary');
+
+    // Recovery counterparts - same batching idea, opposite direction (see forum request:
+    // dashboard users want to reset a "problem" indicator once a device heals, not just set it).
+    this._triggerAvailableAgainSummary = this.homey.flow.getTriggerCard('devices_available_again_summary');
+    this._triggerReportingAgainSummary = this.homey.flow.getTriggerCard('devices_reporting_again_summary');
+    this._triggerBatteryOkAgainSummary = this.homey.flow.getTriggerCard('devices_battery_ok_again_summary');
 
     this.homey.flow.getConditionCard('device_is_unavailable')
       .registerRunListener(async (args) => this._confirmedUnavailable.has(args.device.id)
@@ -506,6 +514,7 @@ class DeviceWatchdogApp extends Homey.App {
         if (!this._isExcludedFromUnavailable(device.id)) {
           const zoneName = device.zone ? (this._zoneMap[device.zone] || '') : '';
           this._recordEvent('available', { device: device.name, zone: zoneName });
+          this._queueAvailableAgainSummary(device.name || '');
         }
       }
     }
@@ -738,6 +747,28 @@ class DeviceWatchdogApp extends Homey.App {
         .catch((err) => this.error('Trigger devices_unavailable_summary fehlgeschlagen:', err));
 
       this._notifyTimeline(this.homey.__('backend.timelineUnavailable', { count: names.length, devices: devicesList }));
+    }, 3000);
+  }
+
+  // Recovery counterpart to _queueUnavailableSummary above - same 3s bundling window, so
+  // devices that come back within a few seconds of each other (e.g. a mesh network
+  // reconnecting all at once) fire one summary trigger instead of one per device.
+  _queueAvailableAgainSummary(name) {
+    this._availableAgainBatch.add(name);
+    if (this._availableAgainBatchTimer) return;
+
+    this._availableAgainBatchTimer = this.homey.setTimeout(() => {
+      const names = Array.from(this._availableAgainBatch);
+      this._availableAgainBatch.clear();
+      this._availableAgainBatchTimer = null;
+
+      const devicesList = formatNameList(names, this.homey);
+
+      this._triggerAvailableAgainSummary
+        ?.trigger({ count: names.length, devices: devicesList })
+        .catch((err) => this.error('Trigger devices_available_again_summary fehlgeschlagen:', err));
+
+      this._notifyTimeline(this.homey.__('backend.timelineAvailableAgain', { count: names.length, devices: devicesList }));
     }, 3000);
   }
 
@@ -1504,6 +1535,26 @@ class DeviceWatchdogApp extends Homey.App {
     }
     for (const device of recoveredLowBattery) {
       this._recordEvent('lowBatteryRecovered', { device: device.name, zone: device.zone });
+    }
+
+    if (recoveredNotReporting.length) {
+      const devicesList = formatNameList(recoveredNotReporting.map((d) => d.name), this.homey);
+
+      await this._triggerReportingAgainSummary
+        ?.trigger({ count: recoveredNotReporting.length, devices: devicesList })
+        .catch((err) => this.error('Trigger devices_reporting_again_summary fehlgeschlagen:', err));
+
+      this._notifyTimeline(this.homey.__('backend.timelineReportingAgain', { count: recoveredNotReporting.length, devices: devicesList }));
+    }
+
+    if (recoveredLowBattery.length) {
+      const devicesList = formatNameList(recoveredLowBattery.map((d) => d.name), this.homey);
+
+      await this._triggerBatteryOkAgainSummary
+        ?.trigger({ count: recoveredLowBattery.length, devices: devicesList })
+        .catch((err) => this.error('Trigger devices_battery_ok_again_summary fehlgeschlagen:', err));
+
+      this._notifyTimeline(this.homey.__('backend.timelineBatteryOkAgain', { count: recoveredLowBattery.length, devices: devicesList }));
     }
 
     // "Since" bookkeeping for the widget detail view - set when a device newly enters a

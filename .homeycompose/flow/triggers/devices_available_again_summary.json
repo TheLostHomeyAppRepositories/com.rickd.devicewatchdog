@@ -1,0 +1,29 @@
+{
+  "id": "devices_available_again_summary",
+  "title": {
+    "en": "Devices become available again",
+    "de": "Geräte werden wieder erreichbar"
+  },
+  "titleFormatted": {
+    "en": "Devices become available again",
+    "de": "Geräte werden wieder erreichbar"
+  },
+  "hint": {
+    "en": "Fires in realtime, bundling every device that becomes available again within a few seconds of each other into a single trigger - the recovery counterpart to \"Devices newly become unavailable\".",
+    "de": "Wird in Echtzeit ausgelöst und bündelt alle Geräte, die innerhalb weniger Sekunden nacheinander wieder erreichbar werden, in einem einzigen Trigger - das Erholungs-Gegenstück zu \"Es werden neu Geräte nicht erreichbar\"."
+  },
+  "tokens": [
+    {
+      "name": "count",
+      "type": "number",
+      "title": { "en": "Count", "de": "Anzahl" },
+      "example": 2
+    },
+    {
+      "name": "devices",
+      "type": "string",
+      "title": { "en": "Devices", "de": "Geräte" },
+      "example": { "en": "Front door lock, Garden sensor", "de": "Haustürschloss, Garten Sensor" }
+    }
+  ]
+}

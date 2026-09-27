@@ -1,0 +1,29 @@
+{
+  "id": "devices_battery_ok_again_summary",
+  "title": {
+    "en": "Devices' battery is OK again",
+    "de": "Akkustand von Geräten ist wieder OK"
+  },
+  "titleFormatted": {
+    "en": "Devices' battery is OK again",
+    "de": "Akkustand von Geräten ist wieder OK"
+  },
+  "hint": {
+    "en": "Fires once per scan, bundling every device whose battery rose back above its threshold in that scan into a single trigger - the recovery counterpart to \"Devices with low battery are newly found\".",
+    "de": "Wird einmal pro Scan ausgelöst und bündelt alle Geräte, deren Akkustand in diesem Scan wieder über die Schwelle gestiegen ist, in einem einzigen Trigger - das Erholungs-Gegenstück zu \"Es werden neu Geräte mit niedrigem Akku gefunden\"."
+  },
+  "tokens": [
+    {
+      "name": "count",
+      "type": "number",
+      "title": { "en": "Count", "de": "Anzahl" },
+      "example": 2
+    },
+    {
+      "name": "devices",
+      "type": "string",
+      "title": { "en": "Devices", "de": "Geräte" },
+      "example": { "en": "Garage sensor, Garden sensor", "de": "Garage Sensor, Garten Sensor" }
+    }
+  ]
+}

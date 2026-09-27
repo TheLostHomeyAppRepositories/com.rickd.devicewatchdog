@@ -1,4 +1,8 @@
 {
+  "1.9.45": {
+    "en": "• New Flow triggers: \"Devices become available again\", \"Devices are reporting again\", \"Devices' battery is OK again\" - the recovery counterparts to the existing \"newly found\" summary triggers, for resetting dashboard indicators once a device heals",
+    "de": "• Neue Flow-Trigger: \"Geräte werden wieder erreichbar\", \"Geräte melden sich wieder\", \"Akkustand von Geräten ist wieder OK\" - die Erholungs-Gegenstücke zu den bestehenden \"neu gefunden\"-Sammel-Triggern, um z.B. Dashboard-Anzeigen zurückzusetzen, sobald sich ein Gerät erholt"
+  },
   "1.9.44": {
     "en": "• Fixed a slightly asymmetric app icon (paw print toes were unevenly spaced/rotated)",
     "de": "• App-Icon korrigiert: Pfoten-Zehen waren leicht asymmetrisch versetzt und rotiert"
