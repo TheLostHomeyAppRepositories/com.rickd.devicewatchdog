@@ -122,6 +122,8 @@
     "statsRecommendation": "Basierend darauf würde ein Schwellwert von __recommended__h Probleme weiterhin zuverlässig erkennen - aktuell ist __current__h eingestellt.",
     "statsApplyButton": "__recommended__h übernehmen",
     "statsError": "Statistik konnte nicht geladen werden: __error__",
+    "recommendationBasisLabel": "Empfehlung basiert auf",
+    "recommendationSafetyFactorLabel": "Sicherheitsfaktor für Empfehlung",
     "statsUnitMin": "Min",
     "statsUnitHour": "Stunden",
     "statsUnitDay": "Tage",

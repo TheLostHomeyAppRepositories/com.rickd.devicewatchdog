@@ -620,6 +620,21 @@ class DeviceWatchdogApp extends Homey.App {
     return (override != null ? override : this.config.lowBatteryDelaySeconds) || 0;
   }
 
+  // Same idea again, for the Recommendations basis/safety-factor pair - lets a device type
+  // that needs a different combo (e.g. an event-driven alarm_contact under 'avg' basis with
+  // a much higher factor) override the global default without affecting every other device.
+  _getRecommendationSafetyFactor(deviceId) {
+    const { rule } = scanner.findRuleIndexed({ id: deviceId }, this._ruleIndex);
+    const override = rule?.recommendationSafetyFactor;
+    return override != null ? override : this.config.recommendationSafetyFactor;
+  }
+
+  _getRecommendationBasis(deviceId) {
+    const { rule } = scanner.findRuleIndexed({ id: deviceId }, this._ruleIndex);
+    const override = rule?.recommendationBasis;
+    return override != null ? override : this.config.recommendationBasis;
+  }
+
   _scheduleUnavailableConfirmation(device, delaySeconds, silent) {
     this._cancelPendingUnavailableConfirmation(device.id);
     const timer = this.homey.setTimeout(() => {
@@ -1205,7 +1220,8 @@ class DeviceWatchdogApp extends Homey.App {
     const bucket = this._updateStats[deviceId] || { entries: [], maxGapMs: null, firstSeenTs: null };
     return {
       ...scanner.computeUpdateStats(
-        bucket.entries, bucket.maxGapMs, this.config.recommendationSafetyFactor, this.config.recommendationBasis,
+        bucket.entries, bucket.maxGapMs,
+        this._getRecommendationSafetyFactor(deviceId), this._getRecommendationBasis(deviceId),
       ),
       firstSeenTs: bucket.firstSeenTs,
     };
@@ -1224,7 +1240,8 @@ class DeviceWatchdogApp extends Homey.App {
       const {
         avgIntervalMs, maxIntervalMs, recommendedHours,
       } = scanner.computeUpdateStats(
-        bucket.entries, bucket.maxGapMs, this.config.recommendationSafetyFactor, this.config.recommendationBasis,
+        bucket.entries, bucket.maxGapMs,
+        this._getRecommendationSafetyFactor(deviceId), this._getRecommendationBasis(deviceId),
       );
       if (recommendedHours == null) continue;
       result[deviceId] = {

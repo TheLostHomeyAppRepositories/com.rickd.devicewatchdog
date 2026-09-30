@@ -122,6 +122,8 @@
     "statsRecommendation": "Based on that, a __recommended__h threshold would still catch real problems reliably - yours is currently set to __current__h.",
     "statsApplyButton": "Apply __recommended__h",
     "statsError": "Couldn't load stats: __error__",
+    "recommendationBasisLabel": "Recommendation based on",
+    "recommendationSafetyFactorLabel": "Recommendation safety margin",
     "statsUnitMin": "min",
     "statsUnitHour": "hours",
     "statsUnitDay": "days",

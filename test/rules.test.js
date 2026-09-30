@@ -32,6 +32,8 @@ describe('sanitizeRule', () => {
     autoTestTriggerOnHeal: true,
     includeBatteryForReporting: true,
     dismissedRecommendedHours: 6,
+    recommendationSafetyFactor: 2.5,
+    recommendationBasis: 'avg',
   };
 
   test('every known field survives the round-trip unchanged', () => {
@@ -88,6 +90,36 @@ describe('sanitizeRule', () => {
     assert.equal(sanitized.pausedUntil, null);
     assert.equal(sanitized.batteryTypeOverride, null);
     assert.equal(sanitized.dismissedRecommendedHours, null);
+    assert.equal(sanitized.recommendationSafetyFactor, null);
+    assert.equal(sanitized.recommendationBasis, null);
+  });
+});
+
+describe('safetyFactorOrNull', () => {
+  test('null/undefined/empty string all mean "inherit the global default"', () => {
+    assert.equal(rulesLib.safetyFactorOrNull(null), null);
+    assert.equal(rulesLib.safetyFactorOrNull(undefined), null);
+    assert.equal(rulesLib.safetyFactorOrNull(''), null);
+  });
+
+  test('clamps to [1.0, 5.0] and rounds to 2 decimals, same as the global setting', () => {
+    assert.equal(rulesLib.safetyFactorOrNull(0.5), 1);
+    assert.equal(rulesLib.safetyFactorOrNull(10), 5);
+    assert.equal(rulesLib.safetyFactorOrNull(1.234), 1.23);
+  });
+
+  test('non-numeric garbage is treated as unset, not a thrown error', () => {
+    assert.equal(rulesLib.safetyFactorOrNull('not a number'), null);
+  });
+});
+
+describe('basisOrNull', () => {
+  test("accepts exactly 'max'/'avg', anything else means inherit", () => {
+    assert.equal(rulesLib.basisOrNull('max'), 'max');
+    assert.equal(rulesLib.basisOrNull('avg'), 'avg');
+    assert.equal(rulesLib.basisOrNull(null), null);
+    assert.equal(rulesLib.basisOrNull(undefined), null);
+    assert.equal(rulesLib.basisOrNull('bogus'), null);
   });
 });
 

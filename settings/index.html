@@ -1084,6 +1084,7 @@
             includeLastSeenForReporting: null, pausedUntil: null, batteryTypeOverride: null,
             autoTestOnStale: false, autoTestTriggerOnHeal: false, includeBatteryForReporting: true,
             dismissedRecommendedHours: null,
+            recommendationSafetyFactor: null, recommendationBasis: null,
           };
           state.rules.push(rule);
         }
@@ -1100,7 +1101,8 @@
           && rule.pausedUntil == null && !rule.batteryTypeOverride
           && !rule.autoTestOnStale && !rule.autoTestTriggerOnHeal
           && rule.includeBatteryForReporting !== false
-          && rule.dismissedRecommendedHours == null;
+          && rule.dismissedRecommendedHours == null
+          && rule.recommendationSafetyFactor == null && rule.recommendationBasis == null;
         if (isEmpty) state.rules = state.rules.filter(function (r) { return r !== rule; });
       }
 
@@ -1490,6 +1492,16 @@
               '</select>' +
             '</div></div>' +
             statsBlockHtml(view) +
+            '<div class="f"><label>' + Homey.__('advanced.recommendationBasisLabel') + '</label>' +
+              '<select data-field="recommendationBasis" data-id="' + id + '">' +
+                '<option value=""' + (r.recommendationBasis == null ? ' selected' : '') + '>' + pd + '</option>' +
+                '<option value="max"' + (r.recommendationBasis === 'max' ? ' selected' : '') + '>' + Homey.__('recommendations.basisMax') + '</option>' +
+                '<option value="avg"' + (r.recommendationBasis === 'avg' ? ' selected' : '') + '>' + Homey.__('recommendations.basisAvg') + '</option>' +
+              '</select>' +
+            '</div>' +
+            '<div class="f"><label>' + Homey.__('advanced.recommendationSafetyFactorLabel') + '</label>' +
+              '<input type="text" inputmode="decimal" class="hy-nostyle" data-field="recommendationSafetyFactor" data-id="' + id + '" value="' + (r.recommendationSafetyFactor == null ? '' : r.recommendationSafetyFactor) + '" placeholder="' + pd + '" />' +
+            '</div>' +
             '<div class="f"><label>' + Homey.__('advanced.includeLastSeen') + '</label>' +
               '<select data-field="includeLastSeenForReporting" data-id="' + id + '">' +
                 '<option value=""' + (r.includeLastSeenForReporting == null ? ' selected' : '') + '>' + pd + '</option>' +
@@ -1814,7 +1826,8 @@
           || r.unavailableDelaySeconds != null || r.lowBatteryDelaySeconds != null
           || r.includeLastSeenForReporting != null
           || r.batteryTypeOverride || r.autoTestOnStale || r.includeBatteryForReporting === false
-          || r.dismissedRecommendedHours != null));
+          || r.dismissedRecommendedHours != null
+          || r.recommendationSafetyFactor != null || r.recommendationBasis != null));
       }
 
       function availDotHtml(d) {
@@ -2057,7 +2070,8 @@
               || r.excludeFromUnavailable || r.unavailableDelaySeconds != null || r.lowBatteryDelaySeconds != null
               || r.includeLastSeenForReporting != null
               || r.batteryTypeOverride || r.autoTestOnStale || r.includeBatteryForReporting === false
-              || r.dismissedRecommendedHours != null);
+              || r.dismissedRecommendedHours != null
+              || r.recommendationSafetyFactor != null || r.recommendationBasis != null);
         }).length;
 
         function statCard(filterKey, num, color, label) {
@@ -2247,6 +2261,8 @@
               rule.autoTestTriggerOnHeal = false;
               rule.includeBatteryForReporting = true;
               rule.dismissedRecommendedHours = null;
+              rule.recommendationSafetyFactor = null;
+              rule.recommendationBasis = null;
               cleanupDeviceRule(e.target.dataset.id);
               scheduleAutoSave(true);
               renderDevices();
@@ -2445,6 +2461,13 @@
             r[field] = displayToSeconds(e.target.value, state.lowBatterySecondsUnit[id] || 's');
           } else if (field === 'includeLastSeenForReporting') {
             r[field] = e.target.value === '' ? null : e.target.value === 'yes';
+          } else if (field === 'recommendationBasis') {
+            r[field] = e.target.value === '' ? null : e.target.value;
+          } else if (field === 'recommendationSafetyFactor') {
+            // Same locale-proof comma-tolerant parse as the global field (v1.9.41) - never
+            // the generic Number(e.target.value) fallback below, which would reintroduce
+            // the OS-locale decimal-separator bug that field was specifically fixed for.
+            r[field] = e.target.value === '' ? null : Number(String(e.target.value).replace(',', '.'));
           } else if (field === 'pausedUntil') {
             r[field] = e.target.value === '' ? null : e.target.value;
             needsRerender = true; // clear/set toggles the inline "Clear pause" button's visibility

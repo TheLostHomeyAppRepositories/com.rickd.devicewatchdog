@@ -1,7 +1,7 @@
 {
   "1.9.46": {
-    "en": "• Recommendations tab: new dropdown to base the suggestion on the average interval instead of the longest observed gap - useful for irregularly-reporting devices (e.g. door/window contacts) where one quiet stretch shouldn't dominate",
-    "de": "• Empfehlungen-Lasche: neues Dropdown, um die Empfehlung auf dem Durchschnittsintervall statt der längsten beobachteten Lücke zu berechnen - nützlich für unregelmäßig meldende Geräte (z.B. Tür-/Fensterkontakte), bei denen eine ruhige Phase nicht alles dominieren soll"
+    "en": "• Recommendations tab: new dropdown to base the suggestion on the average interval instead of the longest observed gap - useful for irregularly-reporting devices (e.g. door/window contacts) where one quiet stretch shouldn't dominate\n• Both the recommendation basis and safety margin can now also be overridden per device in Details, not just globally - use \"Apply to same-type devices\" to roll it out to a whole device type at once",
+    "de": "• Empfehlungen-Lasche: neues Dropdown, um die Empfehlung auf dem Durchschnittsintervall statt der längsten beobachteten Lücke zu berechnen - nützlich für unregelmäßig meldende Geräte (z.B. Tür-/Fensterkontakte), bei denen eine ruhige Phase nicht alles dominieren soll\n• Empfehlungs-Basis und Sicherheitsfaktor lassen sich jetzt auch pro Gerät in den Details überschreiben, nicht nur global - mit \"Auf gleichen Gerätetyp anwenden\" auf einen ganzen Gerätetyp übertragbar"
   },
   "1.9.45": {
     "en": "• New Flow triggers: \"Devices become available again\", \"Devices are reporting again\", \"Devices' battery is OK again\" - the recovery counterparts to the existing \"newly found\" summary triggers, for resetting dashboard indicators once a device heals",
