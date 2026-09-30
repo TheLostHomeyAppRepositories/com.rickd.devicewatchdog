@@ -482,6 +482,14 @@
       <p class="hint" id="hint-rec-min-days">Geräte, die erst kürzer als das beobachtet werden, tauchen noch nicht auf, auch wenn schon genug Meldungen vorliegen.</p>
     </div>
     <div class="field-row">
+      <label for="cfg-recommendation-basis" id="lbl-recommendation-basis">Empfehlung basiert auf</label>
+      <select id="cfg-recommendation-basis">
+        <option value="max" id="opt-basis-max">Längste beobachtete Lücke</option>
+        <option value="avg" id="opt-basis-avg">Durchschnittliches Intervall</option>
+      </select>
+      <p class="hint" id="hint-recommendation-basis">Durchschnitt ergibt kürzere, aggressivere Vorschläge - für unregelmäßig meldende Geräte (z.B. Tür-/Fensterkontakte) brauchst du damit meist einen deutlich höheren Sicherheitsfaktor weiter unten, um nicht ständig übereifrige Vorschläge zu bekommen.</p>
+    </div>
+    <div class="field-row">
       <label for="cfg-safety-factor" id="lbl-safety-factor">Sicherheitsfaktor für Empfehlungen</label>
       <input type="text" inputmode="decimal" id="cfg-safety-factor" class="hy-nostyle" />
       <p class="hint" id="hint-safety-factor">Wie viel Puffer die Empfehlung über die längste tatsächlich beobachtete Lücke hinaus einrechnet (Standard 1.5x). Kleiner stellen (z.B. 1.3) für engere Vorschläge - nicht unter 1.0x möglich, da sonst ein Schwellwert vorgeschlagen würde, der kürzer ist als eine bereits beobachtete Lücke.</p>
@@ -766,6 +774,10 @@
         document.getElementById('rec-dismiss-hint').textContent = Homey.__('recommendations.dismissHint');
         document.getElementById('lbl-rec-min-days').textContent = Homey.__('recommendations.minDaysLabel');
         document.getElementById('hint-rec-min-days').textContent = Homey.__('recommendations.minDaysHint');
+        document.getElementById('lbl-recommendation-basis').textContent = Homey.__('recommendations.basisLabel');
+        document.getElementById('opt-basis-max').textContent = Homey.__('recommendations.basisMax');
+        document.getElementById('opt-basis-avg').textContent = Homey.__('recommendations.basisAvg');
+        document.getElementById('hint-recommendation-basis').textContent = Homey.__('recommendations.basisHint');
         document.getElementById('lbl-safety-factor').textContent = Homey.__('recommendations.safetyFactorLabel');
         document.getElementById('hint-safety-factor').textContent = Homey.__('recommendations.safetyFactorHint');
         document.getElementById('rec-loading').textContent = Homey.__('recommendations.loading');
@@ -1003,6 +1015,7 @@
         document.getElementById('cfg-alarm-low-battery').checked = c.alarmIncludesLowBattery !== false;
         document.getElementById('cfg-high-contrast').checked = !!c.highContrastText;
         document.getElementById('cfg-color-theme').value = c.colorTheme || 'auto';
+        document.getElementById('cfg-recommendation-basis').value = c.recommendationBasis === 'avg' ? 'avg' : 'max';
         document.getElementById('cfg-safety-factor').value = String(c.recommendationSafetyFactor);
         document.getElementById('row-interval-minutes').style.display = c.scanIntervalEnabled ? '' : 'none';
         applyHighContrast(!!c.highContrastText);
@@ -1049,6 +1062,7 @@
           // system expecting "1,5" (confirmed live). Still accepts a typed "," defensively,
           // since some users will type it out of habit anyway.
           recommendationSafetyFactor: Number(String(document.getElementById('cfg-safety-factor').value).replace(',', '.')) || 1.5,
+          recommendationBasis: document.getElementById('cfg-recommendation-basis').value === 'avg' ? 'avg' : 'max',
         };
       }
 
@@ -2896,14 +2910,19 @@
       document.getElementById('tab-settings').addEventListener('input', function () { scheduleAutoSave(false); });
       document.getElementById('tab-settings').addEventListener('change', function () { scheduleAutoSave(true); });
 
-      // cfg-safety-factor lives in #tab-recommendations, not #tab-settings, so it isn't
-      // covered by the delegated listeners above - and since recommendedHours is computed
-      // server-side, only a real /devices/stats re-fetch (not a client-side re-filter like
-      // rec-min-days does) can reflect a changed factor in the already-open list.
+      // cfg-safety-factor and cfg-recommendation-basis both live in #tab-recommendations,
+      // not #tab-settings, so neither is covered by the delegated listeners above - and
+      // since recommendedHours is computed server-side, only a real /devices/stats
+      // re-fetch (not a client-side re-filter like rec-min-days does) can reflect a
+      // changed factor/basis in the already-open list.
       document.getElementById('cfg-safety-factor').addEventListener('input', function () {
         scheduleAutoSave(false);
       });
       document.getElementById('cfg-safety-factor').addEventListener('change', function () {
+        var pending = scheduleAutoSave(true);
+        if (pending && typeof pending.then === 'function') pending.then(loadRecommendations);
+      });
+      document.getElementById('cfg-recommendation-basis').addEventListener('change', function () {
         var pending = scheduleAutoSave(true);
         if (pending && typeof pending.then === 'function') pending.then(loadRecommendations);
       });

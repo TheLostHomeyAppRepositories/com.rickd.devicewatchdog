@@ -1,4 +1,8 @@
 {
+  "1.9.46": {
+    "en": "• Recommendations tab: new dropdown to base the suggestion on the average interval instead of the longest observed gap - useful for irregularly-reporting devices (e.g. door/window contacts) where one quiet stretch shouldn't dominate",
+    "de": "• Empfehlungen-Lasche: neues Dropdown, um die Empfehlung auf dem Durchschnittsintervall statt der längsten beobachteten Lücke zu berechnen - nützlich für unregelmäßig meldende Geräte (z.B. Tür-/Fensterkontakte), bei denen eine ruhige Phase nicht alles dominieren soll"
+  },
   "1.9.45": {
     "en": "• New Flow triggers: \"Devices become available again\", \"Devices are reporting again\", \"Devices' battery is OK again\" - the recovery counterparts to the existing \"newly found\" summary triggers, for resetting dashboard indicators once a device heals",
     "de": "• Neue Flow-Trigger: \"Geräte werden wieder erreichbar\", \"Geräte melden sich wieder\", \"Akkustand von Geräten ist wieder OK\" - die Erholungs-Gegenstücke zu den bestehenden \"neu gefunden\"-Sammel-Triggern, um z.B. Dashboard-Anzeigen zurückzusetzen, sobald sich ein Gerät erholt"

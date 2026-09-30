@@ -671,6 +671,38 @@ describe('computeUpdateStats', () => {
     assert.equal(scanner.computeUpdateStats(entries, null, NaN).recommendedHours, 5);
   });
 
+  test("basis 'avg' derives recommendedHours from avgIntervalMs instead of maxIntervalMs", () => {
+    const start = 1_700_000_000_000;
+    // Same mostly-10min/one-3h-gap entries as above: avgIntervalMs = 52.5min = 0.875h.
+    const entries = [
+      entry(start),
+      entry(start + 10 * 60 * 1000),
+      entry(start + 20 * 60 * 1000),
+      entry(start + 3 * HOUR + 20 * 60 * 1000),
+      entry(start + 3 * HOUR + 30 * 60 * 1000),
+    ];
+    const result = scanner.computeUpdateStats(entries, null, 1.5, 'avg');
+    // ceil(0.875h * 1.5) = ceil(1.3125) = 2h - very different from the 'max' basis's 5h.
+    assert.equal(result.recommendedHours, 2);
+    // avgIntervalMs/maxIntervalMs themselves are always the true observed values,
+    // regardless of which one drives recommendedHours.
+    assert.equal(result.maxIntervalMs, 3 * HOUR);
+  });
+
+  test("an unrecognized/missing basis falls back to the existing 'max' behavior", () => {
+    const start = 1_700_000_000_000;
+    const entries = [
+      entry(start),
+      entry(start + 10 * 60 * 1000),
+      entry(start + 20 * 60 * 1000),
+      entry(start + 3 * HOUR + 20 * 60 * 1000),
+      entry(start + 3 * HOUR + 30 * 60 * 1000),
+    ];
+    assert.equal(scanner.computeUpdateStats(entries, null, 1.5, undefined).recommendedHours, 5);
+    assert.equal(scanner.computeUpdateStats(entries, null, 1.5, 'max').recommendedHours, 5);
+    assert.equal(scanner.computeUpdateStats(entries, null, 1.5, 'bogus').recommendedHours, 5);
+  });
+
   test('recommendedHours is never below the 1h floor for a very chatty device', () => {
     const start = 1_700_000_000_000;
     const entries = [0, 1, 2, 3, 4, 5].map((i) => entry(start + i * 60 * 1000)); // every minute

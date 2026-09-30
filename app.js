@@ -93,6 +93,14 @@ function safetyFactorOrDefault(value, fallback) {
   return Math.round(Math.min(5, Math.max(1, n)) * 100) / 100;
 }
 
+// Whitelists config.recommendationBasis (see lib/scanner.js#computeUpdateStats) to exactly
+// 'max'/'avg' - anything else (missing, a stray value) falls back rather than being stored
+// verbatim, same "client input is a hint only" reasoning as the numeric guards above.
+function basisOrDefault(value, fallback) {
+  if (value === 'avg' || value === 'max') return value;
+  return fallback;
+}
+
 // One-time migration: the per-device override used to be "days until offline"
 // (notReportingDays), now it's hours (notReportingHours) to match the base threshold.
 function migrateRuleToHours(rule) {
@@ -902,6 +910,9 @@ class DeviceWatchdogApp extends Homey.App {
         recommendationSafetyFactor: safetyFactorOrDefault(
           config.recommendationSafetyFactor, DEFAULT_CONFIG.recommendationSafetyFactor,
         ),
+        recommendationBasis: basisOrDefault(
+          config.recommendationBasis, DEFAULT_CONFIG.recommendationBasis,
+        ),
       };
       this.homey.settings.set(SETTINGS_KEY_CONFIG, this.config);
     }
@@ -1193,7 +1204,9 @@ class DeviceWatchdogApp extends Homey.App {
   async getDeviceUpdateStats(deviceId) {
     const bucket = this._updateStats[deviceId] || { entries: [], maxGapMs: null, firstSeenTs: null };
     return {
-      ...scanner.computeUpdateStats(bucket.entries, bucket.maxGapMs, this.config.recommendationSafetyFactor),
+      ...scanner.computeUpdateStats(
+        bucket.entries, bucket.maxGapMs, this.config.recommendationSafetyFactor, this.config.recommendationBasis,
+      ),
       firstSeenTs: bucket.firstSeenTs,
     };
   }
@@ -1210,7 +1223,9 @@ class DeviceWatchdogApp extends Homey.App {
     for (const [deviceId, bucket] of Object.entries(this._updateStats)) {
       const {
         avgIntervalMs, maxIntervalMs, recommendedHours,
-      } = scanner.computeUpdateStats(bucket.entries, bucket.maxGapMs, this.config.recommendationSafetyFactor);
+      } = scanner.computeUpdateStats(
+        bucket.entries, bucket.maxGapMs, this.config.recommendationSafetyFactor, this.config.recommendationBasis,
+      );
       if (recommendedHours == null) continue;
       result[deviceId] = {
         avgIntervalMs, maxIntervalMs, recommendedHours, firstSeenTs: bucket.firstSeenTs,
