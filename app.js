@@ -809,27 +809,37 @@ class DeviceWatchdogApp extends Homey.App {
       this._startupGraceTimer = null;
     }
 
-    if (this.config.scanIntervalEnabled && this.config.scanIntervalMinutes > 0) {
-      const ms = this.config.scanIntervalMinutes * 60 * 1000;
+    if (!(this.config.scanIntervalEnabled && this.config.scanIntervalMinutes > 0)) return;
+
+    const ms = this.config.scanIntervalMinutes * 60 * 1000;
+    const startInterval = () => {
       this._intervalTimer = this.homey.setInterval(() => {
         this.runScan('interval').catch((err) => this.error('Intervall-Scan fehlgeschlagen:', err));
       }, ms);
+    };
 
+    // Startup transient guard: right after the app itself starts (Homey boot/restart, app
+    // update), HomeyAPI's device cache may not be fully settled yet - scanning immediately
+    // can produce a burst of spurious "not reporting" flags that clear up a few minutes
+    // later on their own (see forum report). Only delays this very first scan and the
+    // recurring interval's own start - manual scans are unaffected.
+    const graceMs = runImmediately ? this.config.startupGraceMinutes * 60 * 1000 : 0;
+    if (graceMs > 0) {
+      // The recurring interval itself must wait for the grace delay too, not just this one
+      // extra scan - started as a plain setInterval right away, its own first tick would
+      // otherwise fire (and race past the grace delay) after just scanIntervalMinutes,
+      // silently defeating the setting whenever that's shorter than startupGraceMinutes
+      // (confirmed live - forum report, Sep 2026: 15min grace configured, but the interval's
+      // own ~3min tick ran first after a Homey restart).
+      this._startupGraceTimer = this.homey.setTimeout(() => {
+        this._startupGraceTimer = null;
+        this.runScan('interval').catch((err) => this.error('Initial-Scan fehlgeschlagen:', err));
+        startInterval();
+      }, graceMs);
+    } else {
+      startInterval();
       if (runImmediately) {
-        // Startup transient guard: right after the app itself starts (Homey boot/restart,
-        // app update), HomeyAPI's device cache may not be fully settled yet - scanning
-        // immediately can produce a burst of spurious "not reporting" flags that clear up
-        // a few minutes later on their own (see forum report). Only delays this very first
-        // scan - manual scans and every later interval tick are unaffected.
-        const graceMs = this.config.startupGraceMinutes * 60 * 1000;
-        if (graceMs > 0) {
-          this._startupGraceTimer = this.homey.setTimeout(() => {
-            this._startupGraceTimer = null;
-            this.runScan('interval').catch((err) => this.error('Initial-Scan fehlgeschlagen:', err));
-          }, graceMs);
-        } else {
-          this.runScan('interval').catch((err) => this.error('Initial-Scan fehlgeschlagen:', err));
-        }
+        this.runScan('interval').catch((err) => this.error('Initial-Scan fehlgeschlagen:', err));
       }
     }
   }

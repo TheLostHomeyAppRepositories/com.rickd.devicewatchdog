@@ -1,4 +1,8 @@
 {
+  "1.9.47": {
+    "en": "• Fixed: \"Wait after app start\" (startup grace period) wasn't actually delaying the first scan when the regular scan interval was shorter than the grace period - the interval's own first tick could fire before the grace delay was up, causing a burst of false \"not reporting\" flags right after a Homey restart, exactly what this setting exists to prevent",
+    "de": "• Fehlerbehebung: \"Wartezeit nach App-Start\" hat den ersten Scan nicht wirklich verzögert, wenn das reguläre Scan-Intervall kürzer war als die Wartezeit - der erste Intervall-Durchlauf konnte vor Ablauf der Wartezeit feuern, was direkt nach einem Homey-Neustart zu falschen \"meldet sich nicht\"-Meldungen führte - genau das, was diese Einstellung verhindern soll"
+  },
   "1.9.46": {
     "en": "• Recommendations tab: new dropdown to base the suggestion on the average interval instead of the longest observed gap - useful for irregularly-reporting devices (e.g. door/window contacts) where one quiet stretch shouldn't dominate\n• Both the recommendation basis and safety margin can now also be overridden per device in Details, not just globally - use \"Apply to same-type devices\" to roll it out to a whole device type at once",
     "de": "• Empfehlungen-Lasche: neues Dropdown, um die Empfehlung auf dem Durchschnittsintervall statt der längsten beobachteten Lücke zu berechnen - nützlich für unregelmäßig meldende Geräte (z.B. Tür-/Fensterkontakte), bei denen eine ruhige Phase nicht alles dominieren soll\n• Empfehlungs-Basis und Sicherheitsfaktor lassen sich jetzt auch pro Gerät in den Details überschreiben, nicht nur global - mit \"Auf gleichen Gerätetyp anwenden\" auf einen ganzen Gerätetyp übertragbar"
